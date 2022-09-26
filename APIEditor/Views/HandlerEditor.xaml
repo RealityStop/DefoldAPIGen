@@ -1,0 +1,29 @@
+﻿<Window x:Class="APIEditor.Views.HandlerEditor"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:APIEditor.Views"
+        xmlns:configuration="clr-namespace:APILib.Configuration;assembly=APILib"
+        d:DataContext="{d:DesignInstance configuration:CustomClass}"
+        mc:Ignorable="d"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
+        Title="HandlerEditor" Height="450" Width="800">
+    <DockPanel>
+        <GroupBox Header="Class Info">
+            <DockPanel>
+            <TextBox Text="{Binding ClassName}"  hc:InfoElement.Placeholder="Enter a name for the class here" DockPanel.Dock="Top"/>
+            <CheckBox IsChecked="{Binding IsSystemClass}" DockPanel.Dock="Top">System Class?</CheckBox>
+            <hc:TagContainer Name="tagContainer" Margin="11"  Padding="5" ItemsSource="{Binding Implements}" DockPanel.Dock="Top">
+                <hc:Tag Margin="5" Content="Text"/>
+            </hc:TagContainer>
+            <DockPanel>
+                <Button Content="Add" DockPanel.Dock="Right"/>
+                <TextBox Text="{Binding ImplementsToAdd}" hc:InfoElement.Placeholder="implementor name"/>
+            </DockPanel>
+            </DockPanel>
+        </GroupBox>
+    </DockPanel>
+        
+    
+</Window>

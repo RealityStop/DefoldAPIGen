@@ -1,0 +1,38 @@
+﻿<UserControl x:Class="APIEditor.Views.Configuration"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:APIEditor.Views"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             xmlns:viewModels="clr-namespace:APIEditor.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance viewModels:ConfigurationVM}"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Expander>
+        <Expander.Header>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Config" />
+                <TextBlock Margin="10,0" Foreground="MidnightBlue" Text="{Binding APIVersion, StringFormat={}(version: {0})}" />
+            </StackPanel>
+        </Expander.Header>
+        <StackPanel Orientation="Vertical">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="API Location" />
+                <Button Content="Browse" DockPanel.Dock="Right" Style="{StaticResource ButtonPrimary}"
+                        Command="{Binding BrowseForAPICMD}" />
+                <TextBox Text="{Binding State.Settings.APILocation}" Style="{StaticResource TextBoxExtend}"
+                         hc:InfoElement.Placeholder="Location to load the API from">
+                </TextBox>
+            </DockPanel>
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="Custom Handlers Location" />
+                <Button Content="Browse" DockPanel.Dock="Right" Style="{StaticResource ButtonPrimary}"
+                        Command="{Binding BrowseForHandlersCMD}" />
+                <TextBox Text="{Binding State.Settings.HandlersLocation}" Style="{StaticResource TextBoxExtend}"
+                         hc:InfoElement.Placeholder="Location to load the Custom Handlers from">
+                </TextBox>
+            </DockPanel>
+        </StackPanel>
+    </Expander>
+</UserControl>
