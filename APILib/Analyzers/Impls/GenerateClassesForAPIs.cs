@@ -210,6 +210,8 @@ public class GenerateClassesForAPIs : IAnalyzer
 			}
 			else
 			{
+				
+				
 				var parmOptions = CoveringTypes(type).ToArray();
 				foreach (var customType in parmOptions)
 				{

@@ -82,6 +82,12 @@ public static  class GeneratedClassRenderer
 		var currentParam = parameterOptionsEnumerated.DefaultIfEmpty(new MethodParam("void", "").AddOption(new CustomVoidParam())).First();
 		var remainingParameters = parameterOptionsEnumerated.Skip(1).ToArray();
 
+		//If the current parmeter is optional, then we need to render the method without this parameter, in addition to any options.
+		if (currentParam.IsOptional)
+		{
+			RenderMethod(generatedClass, generatedMethod, returnValue, builder, parametersSoFar, outParametersSoFar);
+		}
+		
 
 		foreach (var parameter in currentParam.Options)
 		{
@@ -117,7 +123,7 @@ public static  class GeneratedClassRenderer
 		builder.AppendLine("/// <summary>");
 		builder.AppendLine($"/// {generatedMethod.Comment}");
 		builder.AppendLine("/// ");
-		builder.AppendLine($"/// @CSharpLua.Template = \"{FormatTemplate(generatedClass,generatedMethod)}\"");
+		builder.AppendLine($"/// @CSharpLua.Template = \"{FormatTemplate(generatedClass,generatedMethod, parametersSoFar)}\"");
 		builder.AppendLine("/// </summary>");
 
 		
@@ -157,6 +163,12 @@ public static  class GeneratedClassRenderer
 		var currentOutParam = outParamsEnumerated.First();
 		var remainingParameters = outParamsEnumerated.Skip(1).ToArray();
 
+		//If the current parmeter is optional, then we need to render the method without this parameter, in addition to any options.
+		if (currentOutParam.IsOptional)
+		{
+			RenderMethod(generatedClass, generatedMethod, returnValue, builder, parametersSoFar, outParametersSoFar);
+		}
+		
 		foreach (var parameter in currentOutParam.Options)
 		{
 			IEnumerable<IMethodParamOption> outParameterList = outParametersSoFar;
@@ -198,11 +210,11 @@ public static  class GeneratedClassRenderer
 	}
 
 
-	private static string FormatTemplate(GeneratedClass generatedClass, GeneratedMethod generatedMethod)
+	private static string FormatTemplate(GeneratedClass generatedClass, GeneratedMethod generatedMethod, IEnumerable<IMethodParamOption> parametersSoFar)
 	{
 		int count = 0;
 
-		var templateParameters = string.Join(", ", generatedMethod.Parameters.Where(x=>!x.Name.Equals("void", StringComparison.OrdinalIgnoreCase)).Select(x =>"{" +  $"{count++}" + "}"));
+		var templateParameters = string.Join(", ", parametersSoFar.Select(x =>"{" +  $"{count++}" + "}"));
 		
 		return $"{generatedClass.ClassName}.{generatedMethod.MethodName}({templateParameters})";
 	}
