@@ -138,7 +138,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 				success = false;
 			}
 		}
-		generatedClass.Methods.Add(new GeneratedMethod(function.FunctionName(), parameterOptions, returnValueOptions));
+		generatedClass.Methods.Add(new GeneratedMethod(function.FunctionName(), parameterOptions, returnValueOptions){Comment = function.Description});
 
 		return success;
 	}
@@ -182,7 +182,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 					skip = true;
 				}
 			}
-			generatedClass.Methods.Add(new GeneratedMethod(function.FunctionName(), parameterOptions, returnValueOptions));
+			generatedClass.Methods.Add(new GeneratedMethod(function.FunctionName(), parameterOptions, returnValueOptions){Comment = function.Description});
 
 			if (skip)
 				success = false;

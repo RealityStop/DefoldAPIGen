@@ -121,7 +121,7 @@ public static  class GeneratedClassRenderer
 	{
 		//TODO: actually do the spec.
 		builder.AppendLine("/// <summary>");
-		builder.AppendLine($"/// {generatedMethod.Comment}");
+		FormatComment(builder, generatedMethod);
 		builder.AppendLine("/// ");
 		builder.AppendLine($"/// @CSharpLua.Template = \"{FormatTemplate(generatedClass,generatedMethod, parametersSoFar)}\"");
 		builder.AppendLine("/// </summary>");
@@ -146,7 +146,15 @@ public static  class GeneratedClassRenderer
 	}
 
 
-	
+	private static char[] splitters = new char[] { '\r', '\n' };
+	private static void FormatComment(FormattedStringBuilder builder, GeneratedMethod generatedMethod)
+	{
+		var split = generatedMethod.Comment.Split(splitters, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+		foreach (var commentLine in split)
+		{
+			builder.AppendLine($"/// {commentLine}");
+		}
+	}
 
 
 	private static void RenderOutPermutations(
