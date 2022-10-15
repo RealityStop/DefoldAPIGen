@@ -5,7 +5,7 @@ namespace APILib.Generators;
 
 public class MethodParam
 {
-	private static Regex optionalParameterDetectorRegex = new Regex(@"\[\w+\]");
+	private static Regex optionalParameterDetectorRegex = new Regex(@"\[[\w-]+\]");
 
 	
 	public string Name { get; }
