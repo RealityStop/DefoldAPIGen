@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Reactive.Disposables;
 using System.Text;
 using APILib.Artifacts;
 using APILib.Configuration;
@@ -14,10 +15,9 @@ public static  class GeneratedClassRenderer
 		FormattedStringBuilder builder = new FormattedStringBuilder();
 		using (WriteInitialPreamble(builder))
 		{
-
-
 			using (WriteClassSpecification(builder, targetClass))
 			{
+				WriteMessages(builder, targetClass);
 				WriteMethods(builder, targetClass);
 			}
 		}
@@ -26,15 +26,13 @@ public static  class GeneratedClassRenderer
 	}
 
 
-
 	private static IDisposable WriteInitialPreamble(FormattedStringBuilder builder)
 	{
 		builder.AppendLine("using System;");
-		builder.AppendLine("using defold.types;");
+		builder.AppendLine("using types;");
 		builder.AppendLine("");
-		builder.AppendLine("namespace defold");
-
-		return builder.Scope();
+		
+		return Disposable.Empty;
 	}
 	
 	private static IDisposable WriteClassSpecification(FormattedStringBuilder builder, GeneratedClass generatedClass)
@@ -45,12 +43,45 @@ public static  class GeneratedClassRenderer
 			builder.AppendLine($"/// {generatedClass.Comment}");
 			builder.AppendLine("/// ");
 		}
-		builder.AppendLine("/// @CSharpLua.Ignore");
 		builder.AppendLine("/// </summary>");
-		builder.AppendLine($"public {(generatedClass.IsStatic? "static " : "")}class {generatedClass.ClassName}");
+		builder.AppendLine($"public {(generatedClass.IsStatic? "static " : "")}class {generatedClass.ClassName.First().ToString().ToUpper() + generatedClass.ClassName.Substring(1)}");
 		
 		return builder.Scope();
 	}
+	
+	
+
+	private static void WriteMessages(FormattedStringBuilder builder, GeneratedClass generatedClass)
+	{
+		foreach (var generatedMessage in generatedClass.Messages)
+		{
+			builder.AppendLine("/// <summary>");
+			if (!string.IsNullOrWhiteSpace(generatedMessage.Comment))
+			{
+				builder.AppendLine($"/// {generatedMessage.Comment}");
+				builder.AppendLine("/// ");
+			}
+			builder.AppendLine("/// </summary>");
+			builder.AppendLine($"public class {generatedMessage.MessageName}_message : MessageImplementation");
+
+
+			using (builder.Scope())
+			{
+				builder.AppendLine($"public static Hash __CODE__ = Defold.hash(\"{generatedMessage.MessageName}\");");
+				builder.AppendLine($"public override Hash FetchCode() => __CODE__;");
+				builder.AppendLine("");
+				
+				foreach (var field in generatedMessage.Fields)	
+				{
+					builder.AppendLine($"public {RenderParamOptionType(field.Options.First())} {field.Name};");
+				}
+			}
+			
+			builder.AppendLine("");
+			builder.AppendLine("");
+		}
+	}
+
 	
 	
 
@@ -121,7 +152,7 @@ public static  class GeneratedClassRenderer
 	{
 		//TODO: actually do the spec.
 		builder.AppendLine("/// <summary>");
-		FormatComment(builder, generatedMethod);
+		FormatComment(builder, generatedMethod.Comment);
 		builder.AppendLine("/// ");
 		builder.AppendLine($"/// @CSharpLua.Template = \"{FormatTemplate(generatedClass,generatedMethod, parametersSoFar)}\"");
 		builder.AppendLine("/// </summary>");
@@ -147,9 +178,9 @@ public static  class GeneratedClassRenderer
 
 
 	private static char[] splitters = new char[] { '\r', '\n' };
-	private static void FormatComment(FormattedStringBuilder builder, GeneratedMethod generatedMethod)
+	private static void FormatComment(FormattedStringBuilder builder, string comment)
 	{
-		var split = generatedMethod.Comment.Split(splitters, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+		var split = comment.Split(splitters, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 		foreach (var commentLine in split)
 		{
 			builder.AppendLine($"/// {commentLine}");

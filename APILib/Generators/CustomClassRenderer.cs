@@ -27,9 +27,8 @@ public static class CustomClassRenderer
 	private static IDisposable WriteInitialPreamble(FormattedStringBuilder builder)
 	{
 		builder.AppendLine("using System;");
-		builder.AppendLine("using defold;");
 		builder.AppendLine("");
-		builder.AppendLine("namespace defold.types");
+		builder.AppendLine("namespace types");
 
 		return builder.Scope();
 	}

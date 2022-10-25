@@ -22,4 +22,10 @@ public class DocJson
 		return Elements.Where(x =>
 			x.Type.Equals("function", StringComparison.OrdinalIgnoreCase));
 	}
+	
+	public IEnumerable<DocElement> Messages()
+	{
+		return Elements.Where(x =>
+			x.Type.Equals("message", StringComparison.OrdinalIgnoreCase));
+	}
 }

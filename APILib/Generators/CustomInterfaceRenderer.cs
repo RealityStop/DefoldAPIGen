@@ -28,9 +28,8 @@ public static class CustomInterfaceRenderer
 	{
 		
 		builder.AppendLine("using System;");
-		builder.AppendLine("using defold;");
 		builder.AppendLine("");
-		builder.AppendLine("namespace defold.types");
+		builder.AppendLine("namespace types");
 
 		return builder.Scope();
 	}

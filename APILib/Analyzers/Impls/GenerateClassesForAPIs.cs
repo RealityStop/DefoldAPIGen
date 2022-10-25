@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml.Schema;
 using APILib.API;
 using APILib.Artifacts;
 using APILib.Configuration;
@@ -17,6 +18,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 	private IEnumerable<TrimmedAPIArtifact> _trimmedAPIs;
 	private CustomHandlersArtifact _customHandlers;
 	private CustomTypesArtifact _customTypes;
+	private IOutput _output;
 
 	//Because variants match against all permutations, they have to list all permutations inside of themselves and only process once.
 	private HashSet<string> _handledVariants = new HashSet<string>();
@@ -37,6 +39,8 @@ public class GenerateClassesForAPIs : IAnalyzer
 		_trimmedAPIs = genState.Analyzers.Artifacts.Of<TrimmedAPIArtifact>();
 		_customHandlers = genState.Analyzers.Artifacts.Of<CustomHandlersArtifact>().First();
 		_customTypes = genState.Analyzers.Artifacts.Of<CustomTypesArtifact>().First();
+		_output = ServiceContainer.Get<IOutput>();
+		;
 
 		foreach (var trimmedAPI in _trimmedAPIs)
 		{
@@ -51,6 +55,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 				
 				
 				GenerateMethods(nameSpace, generatedClass, handler);
+				GenerateMessages(nameSpace, generatedClass, handler);
 				
 				genState.Analyzers.Artifacts.AddArtifact(generatedClass);
 			}
@@ -60,7 +65,6 @@ public class GenerateClassesForAPIs : IAnalyzer
 		
 		Result = new AnalyzerResult(AnalyzerResultType.Success);
 	}
-
 
 
 
@@ -105,10 +109,10 @@ public class GenerateClassesForAPIs : IAnalyzer
 
 		List<DocParam> sourceParameterList = function.Parameters;
 		List<DocParam> sourceReturnList = function.ReturnValues;
-		
+
 		if (overrideMethod != null)
 		{
-			 sourceParameterList = overrideMethod.Parameters ?? new List<DocParam>();
+			sourceParameterList = overrideMethod.Parameters ?? new List<DocParam>();
 			sourceReturnList = overrideMethod.ReturnValues ?? new List<DocParam>();
 		}
 
@@ -119,7 +123,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 				parameterOptions.Add(methodParam);
 			else
 			{
-				ServiceContainer.Get<IOutput>()
+				_output
 					.WriteLine(
 						$"Unable to convert {generatedClass.ClassName}.{function.Name} because of unhandled parameter type '{string.Join(",", parameter.AllTypes())}'");
 				success = false;
@@ -132,7 +136,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 				returnValueOptions.Add(methodParam);
 			else
 			{
-				ServiceContainer.Get<IOutput>()
+				_output
 					.WriteLine(
 						$"Unable to convert {generatedClass.ClassName}.{function.Name} because of unhandled return type '{string.Join(",", returnValue.AllTypes())}'");
 				success = false;
@@ -163,7 +167,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 					parameterOptions.Add(methodParam);
 				else
 				{
-					ServiceContainer.Get<IOutput>()
+					_output
 						.WriteLine(
 							$"Unable to convert {generatedClass.ClassName}.{function.Name} because of unhandled parameter type '{string.Join(",", parameter.AllTypes())}'");
 					skip = true;
@@ -176,7 +180,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 					returnValueOptions.Add(methodParam);
 				else
 				{
-					ServiceContainer.Get<IOutput>()
+					_output
 						.WriteLine(
 							$"Unable to convert {generatedClass.ClassName}.{function.Name} because of unhandled return type '{string.Join(",", returnValue.AllTypes())}'");
 					skip = true;
@@ -195,6 +199,9 @@ public class GenerateClassesForAPIs : IAnalyzer
 
 	private static Regex functionParameterExtractor = new Regex(@"function\((.*)\)");
 	private static Regex functionParameterSeparator = new Regex(@"([\w\d]+)\s+([\w\d]+)");
+	
+
+
 	private bool GenerateMethodParameter(DocParam parmDocumentation, out MethodParam methodParam)
 	{
 		methodParam = new MethodParam(parmDocumentation.name, parmDocumentation.doc);
@@ -278,270 +285,48 @@ public class GenerateClassesForAPIs : IAnalyzer
 	}
 	
 
-	/*private void GenerateParameterizedMethods(GeneratedClass generatedClass, List<MethodParam> finalizedReturnValueOptions,
-		DocElement function, List<MethodParam> finalizedParameterOptions)
+	
+	private void GenerateMessages(DocJson nameSpace, GeneratedClass generatedClass, CustomHandler outValue)
 	{
-		var coreReturnValue = finalizedReturnValueOptions.First();
-		var outParams = finalizedReturnValueOptions.Skip(1);
-
-		foreach (var returnOptions in coreReturnValue.Options)
+		foreach (var message in nameSpace.Messages())
 		{
-			StringBuilder specificationBuilder = new StringBuilder();
-			specificationBuilder.Append("public ");
-			if (generatedClass.IsStatic)
-				specificationBuilder.Append("static ");
-			specificationBuilder.Append("extern ");
-			if (returnOptions is CustomVoidParam)
-				specificationBuilder.Append("void");
-			else
-				specificationBuilder.Append(coreReturnValue.Name);
+			bool allParamsValid = true;
 
-			List<GeneratedMethod> methods = new List<GeneratedMethod>();
-			FormatParameters(function.FunctionName(), methods, specificationBuilder.ToString(), finalizedParameterOptions,
-				new CustomType[0], outParams, new CustomType[0]);
-			foreach (var method in methods)
+			var paramList = message.Parameters.Select(x =>
 			{
-				method.Comment = function.Brief;
-			}
-
-			generatedClass.Methods.AddRange(methods);
-		}
-	}*/
-
-
-
-
-	/*private bool FetchParametersAndReturnValues(DocJson nameSpace,
-		DocElement function, CustomHandler customHandler, out IEnumerable<GeneratedParam>[] finalizedParameterOptions,
-		out IEnumerable<GeneratedParam>[] finalizedReturnValueOptions)
-	{
-		bool skip = false;
-		finalizedParameterOptions = default;
-		finalizedReturnValueOptions = default;
-		
-		
-		List<IEnumerable<GeneratedParam>> parameterOptions = new List<IEnumerable<GeneratedParam>>();
-		List<IEnumerable<GeneratedParam>> returnValueOptions = new List<IEnumerable<GeneratedParam>>();
-
-		
-		
-		//Check for overrides to the parameters
-		bool hasCustomParameters = false;
-		bool hasCustomReturnValues = false;
-		if (customHandler?.Overrides?.TryFetchOverrideForFunction(function, out var overrideMethod) ?? false)
-		{
-			if (overrideMethod.Parameters != null)
-			{
-				hasCustomParameters = true;
-				skip |= FunctionOverrideParameters(nameSpace, function, overrideMethod, out parameterOptions);
-			}
-
-			if (overrideMethod.ReturnValues != null)
-			{
-				hasCustomReturnValues = true;
-				skip |= FunctionOverrideReturnValues(nameSpace, function, overrideMethod, out returnValueOptions);
-			}
-		}
-
-		if (!hasCustomParameters)
-			skip |= FunctionStandardParameters(nameSpace, function, out parameterOptions);
-
-		if (!hasCustomReturnValues)
-			skip |= FunctionStandardReturnValues(nameSpace, function, out returnValueOptions);
-
-		if (skip)
-			return true;
-
-		finalizedParameterOptions = parameterOptions.ToArray();
-		finalizedReturnValueOptions = returnValueOptions.DefaultIfEmpty(new CustomType[] { CustomType.Void }).ToArray();
-		return false;
-	}*/
-
-	
-	/*private bool FunctionStandardParameters(DocJson nameSpace, DocElement function, out List<IEnumerable<GeneratedParam>> parameterOptions)
-	{
-		bool skip = false;
-		parameterOptions = new List<IEnumerable<GeneratedParam>>();
-		foreach (var parameter in function.Parameters)
-		{
-			var coveringTypes = parameter.AllTypes().Select(x => CoveringTypes(x)).ToArray();
-			if (coveringTypes.Any(x => !x.Any()))
-			{
-				ServiceContainer.Get<IOutput>()
-					.WriteLine(
-						$"Unable to convert {nameSpace.Info.Namespace}.{function.Name} because of unhandled parameter type '{string.Join(",", parameter.AllTypes())}'");
-				skip = true;
-			}
-			else
-			{
-				parameterOptions.Add(coveringTypes.SelectMany(x => x));
-			}
-		}
-
-		return skip;
-	}*/
-
-
-
-	/*private bool FunctionOverrideParameters(DocJson nameSpace, DocElement function, OverrideMethod overrideMethod,
-		out List<IEnumerable<CustomType>> returnValueOptions)
-	{
-		bool skip = false;
-		returnValueOptions = new List<IEnumerable<CustomType>>();
-		foreach (var returnValue in overrideMethod.Parameters)
-		{
-			var coveringTypes = returnValue.AllTypes().Select(x => CoveringTypes(x)).ToArray();
-			if (coveringTypes.Any(x => !x.Any()))
-			{
-				ServiceContainer.Get<IOutput>()
-					.WriteLine(
-						$"Unable to convert {nameSpace.Info.Namespace}.{function.Name} because of unhandled parameter type `{string.Join(",", returnValue.AllTypes())}`");
-				skip = true;
-			}
-			else
-			{
-				returnValueOptions.Add(coveringTypes.SelectMany(x => x));
-			}
-		}
-
-		return skip;
-	}*/
-	
-
-	
-
-
-	/*private bool FunctionStandardReturnValues(DocJson nameSpace, DocElement function, out List<IEnumerable<CustomType>> returnValueOptions)
-	{
-		bool skip = false;
-		returnValueOptions = new List<IEnumerable<CustomType>>();
-		foreach (var returnValue in function.ReturnValues)
-		{
-			var coveringTypes = returnValue.AllTypes().Select(x => CoveringTypes(x)).ToArray();
-			if (coveringTypes.Any(x => !x.Any()))
-			{
-				ServiceContainer.Get<IOutput>()
-					.WriteLine(
-						$"Unable to convert {nameSpace.Info.Namespace}.{function.Name} because of unhandled return value '{string.Join(",", returnValue.AllTypes())}'");
-				skip = true;
-			}
-			else
-			{
-				returnValueOptions.Add(coveringTypes.SelectMany(x => x));
-			}
-		}
-
-		return skip;
-	}*/
-	
-	/*private bool FunctionOverrideReturnValues(DocJson nameSpace, DocElement function, OverrideMethod overrideMethod,
-		out List<IEnumerable<CustomType>> returnValues)
-	{
-		bool skip = false;
-		
-		
-		returnValues = new List<IEnumerable<CustomType>>();
-		foreach (var parameter in overrideMethod.ReturnValues)
-		{
-			var coveringTypes = parameter.AllTypes().Select(x => CoveringTypes(x)).ToArray();
-			if (coveringTypes.Any(x => !x.Any()))
-			{
-				ServiceContainer.Get<IOutput>()
-					.WriteLine(
-						$"Unable to convert {nameSpace.Info.Namespace}.{function.Name} because of unhandled return value '{string.Join(",", parameter.AllTypes())}'");
-				skip = true;
-			}
-			else
-			{
-				returnValues.Add(coveringTypes.SelectMany(x => x));
-			}
-		}
-
-		return skip;
-	}*/
-	
-	
-	
-	
-
-	/*private void FormatParameters(
-		string methodName,
-		List<GeneratedMethod> methods,
-		string baseSpecification,
-		IEnumerable<MethodParam> parameterOptions,
-		IEnumerable<MethodParam> parametersSoFar,
-		IEnumerable<MethodParam> outParams,
-		IEnumerable<MethodParam> outParametersSoFar)
-	{
-		var parameterOptionsEnumerated = parameterOptions as IEnumerable<MethodParam>[] ?? parameterOptions.ToArray();
-		var outParamsEnumerated = outParams as IEnumerable<MethodParam>[] ?? outParams.ToArray();
-		var iteratingList = parameterOptionsEnumerated.DefaultIfEmpty(new CustomTypeGeneratedParam[]{new CustomTypeGeneratedParam(CustomType.Void)}).First();
-		var remainingParameters = parameterOptionsEnumerated.Skip(1).ToArray();
-
-		
-		foreach (var parameter in iteratingList)
-		{
-			IEnumerable<GeneratedParam> parameterList = parametersSoFar;
-			if (parameter is not CustomVoidParam)
-				parameterList = parametersSoFar.Append(parameter);
-		
-			if (remainingParameters.Any())
-			{
-				FormatParameters(methodName, methods, baseSpecification, remainingParameters, parameterList, outParamsEnumerated, outParametersSoFar);				
-			}
-			else
-			{
-				if (outParamsEnumerated.Any())
+				var coveringTypes = x.AllTypes().SelectMany(y => CoveringTypes(y));
+				if (coveringTypes.Count() != 1)
 				{
-					FormatOutParameters(methodName, methods, baseSpecification, remainingParameters, parameterList, outParamsEnumerated, outParametersSoFar);
+					_output.WriteLine(
+						$"Unable to generate message {nameSpace.Info.Name}.{message.Name} due to unhandled parameter type {x.type}");
+					allParamsValid = false;
+					return null;
 				}
-				else
+
+				var methodparm = new MethodParam(x.name, x.doc);
+				foreach (var coveringType in coveringTypes)
 				{
-					methods.Add(new GeneratedMethod(methodName, baseSpecification, parameterList.Where(x=>!x.Name.Equals("void", StringComparison.OrdinalIgnoreCase)), outParametersSoFar));
+					methodparm.AddOption(new CustomTypeGeneratedParam(coveringType));
 				}
-			}
+
+				return methodparm;
+			})
+				.Where(x=>x!=null);
+
+
+			if (!allParamsValid)
+				continue;
+
+
+
+			var generatedMessage = new GeneratedMessage(message.Name, paramList.ToArray());
+			generatedClass.Messages.Add(generatedMessage);
+			
+			message.Generated = true;
 		}
+	}
 
-	}*/
-
-
-	/*private void FormatOutParameters(
-		string methodName,
-		List<GeneratedMethod> methods,
-		string baseSpecification,
-		IEnumerable<IEnumerable<GeneratedParam>> parameterOptions,
-		IEnumerable<GeneratedParam> parametersSoFar,
-		IEnumerable<IEnumerable<GeneratedParam>> outParams,
-		IEnumerable<GeneratedParam> outParametersSoFar)
-	{
-		var outParamsEnumerated = outParams as IEnumerable<GeneratedParam>[] ?? outParams.ToArray();
-		var iteratingList = outParamsEnumerated.First();
-		var remainingParameters = outParamsEnumerated.Skip(1).ToArray();
-
-		foreach (var parameter in iteratingList)
-		{
-			outParametersSoFar = outParametersSoFar.Append(parameter);
-
-			if (remainingParameters.Any())
-			{
-				FormatOutParameters(methodName, methods, baseSpecification, parameterOptions, parametersSoFar, remainingParameters, outParametersSoFar);
-			}
-			else
-			{
-				methods.Add(new GeneratedMethod(methodName, baseSpecification, parametersSoFar, outParametersSoFar));
-			}
-		}
-	}*/
-
-
-	// static IEnumerable<IEnumerable<T>> GetPermutations<T>(IEnumerable<T> list, int length)
-	// {
-	// 	if (length == 1) return list.Select(t => new T[] { t });
-	//
-	// 	return GetPermutations(list, length - 1)
-	// 		.SelectMany(t => list.Where(e => !t.Contains(e)),
-	// 			(t1, t2) => t1.Concat(new T[] { t2 }));
-	// }
+	
 	
 
 	private IEnumerable<CustomType> CoveringTypes(string name)
