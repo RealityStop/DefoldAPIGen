@@ -47,13 +47,15 @@ public static class CustomInterfaceRenderer
 			builder.AppendLine($"/// {customClass.Comment}");
 			builder.AppendLine("/// ");
 		}
-		if (customType.LuaHandling == null)
-			builder.AppendLine("/// @CSharpLua.Ignore");
-		else if (customType.LuaHandling.Handling == CustomLuaHandling.HandlingType.Ignore)
-			builder.AppendLine("/// @CSharpLua.Ignore");
-		else if (customType.LuaHandling?.Handling == CustomLuaHandling.HandlingType.Template)
-			builder.AppendLine($"/// @CSharpLua.Template = {customType.LuaHandling.Template}");
-		
+
+		if (customType.LuaHandling != null)
+		{
+			if (customType.LuaHandling.Handling == CustomLuaHandling.HandlingType.Ignore)
+				builder.AppendLine("/// @CSharpLua.Ignore");
+			else if (customType.LuaHandling?.Handling == CustomLuaHandling.HandlingType.Template)
+				builder.AppendLine($"/// @CSharpLua.Template = {customType.LuaHandling.Template}");
+		}
+
 		builder.AppendLine("/// </summary>");
 		if (!string.IsNullOrWhiteSpace(customClass.Custom))
 			builder.AppendLine(customClass.Custom);
