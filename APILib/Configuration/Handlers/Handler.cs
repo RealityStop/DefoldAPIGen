@@ -13,5 +13,5 @@ public class Handler
 	[JsonProperty] public string CustomContent { get; set; }
 
 
-	public HandlerOverrides HandlerOverrides { get; set; }
+	public HandlerOverrides Overrides { get; set; }
 }

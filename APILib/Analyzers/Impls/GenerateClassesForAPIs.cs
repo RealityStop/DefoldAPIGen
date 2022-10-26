@@ -91,7 +91,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 
 			bool skip = false;
 			HandlerOverrideMethod overrideMethod = null;
-			if (handler?.HandlerOverrides?.TryFetchOverrideForFunction(function, out overrideMethod) ?? false)
+			if (handler?.Overrides?.TryFetchOverrideForFunction(function, out overrideMethod) ?? false)
 			{
 				if (overrideMethod.Variants?.Any() ?? false)
 				{
@@ -287,7 +287,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 	
 	private bool ShouldIgnoreMethod(DocElement function, Handler handler)
 	{
-		if (handler?.HandlerOverrides?.TryFetchOverrideForFunction(function, out var overrideMethod) ?? false)
+		if (handler?.Overrides?.TryFetchOverrideForFunction(function, out var overrideMethod) ?? false)
 		{
 			return overrideMethod.Ignore;
 		}
