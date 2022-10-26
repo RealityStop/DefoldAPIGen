@@ -1,11 +1,11 @@
-﻿using APILib.Configuration;
+﻿using APILib.Configuration.CustomTypes;
 using APILib.Helpers;
 
-namespace APILib.Generators;
+namespace APILib.Analyzers.Generators;
 
 public static class CustomEnumRenderer
 {
-	public static string Render(CustomType customClass)
+	public static string Render(CustomTypeDefinition customClass)
 	{
 		if (!customClass.Specification.Type.Equals("CustomEnum"))
 			throw new InvalidOperationException();
@@ -35,7 +35,7 @@ public static class CustomEnumRenderer
 	
 	
 
-	private static IDisposable WriteClassSpecification(FormattedStringBuilder builder, CustomType customType)
+	private static IDisposable WriteClassSpecification(FormattedStringBuilder builder, CustomTypeDefinition customType)
 	{
 		var customClass = customType.Specification as CustomEnum;
 		
@@ -46,11 +46,15 @@ public static class CustomEnumRenderer
 			builder.AppendLine($"/// {customClass.Comment}");
 			builder.AppendLine("/// ");
 		}
-		if (customType.Handling.Handling == CustomLuaHandling.HandlingType.Ignore)
-			builder.AppendLine("/// @CSharpLua.Ignore");
-		else if (customType.Handling.Handling == CustomLuaHandling.HandlingType.Template)
-			builder.AppendLine($"/// @CSharpLua.Template = {customType.Handling.Template}");
-		
+
+		if (customType.LuaHandling != null)
+		{
+			if (customType.LuaHandling.Handling == CustomLuaHandling.HandlingType.Ignore)
+				builder.AppendLine("/// @CSharpLua.Ignore");
+			else if (customType.LuaHandling.Handling == CustomLuaHandling.HandlingType.Template)
+				builder.AppendLine($"/// @CSharpLua.Template = {customType.LuaHandling.Template}");
+		}
+
 		builder.AppendLine("/// </summary>");
 		builder.AppendLine($"public enum {customType.Name}");
 		
@@ -59,7 +63,7 @@ public static class CustomEnumRenderer
 
 
 
-	private static void WriteContent(FormattedStringBuilder builder, CustomType customType)
+	private static void WriteContent(FormattedStringBuilder builder, CustomTypeDefinition customType)
 	{
 		var customEnum = customType.Specification as CustomEnum;
 

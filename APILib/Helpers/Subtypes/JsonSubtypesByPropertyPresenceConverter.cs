@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace TRAX.Extensions.JSON.Subtypes;
+﻿namespace APILib.Helpers.Subtypes;
 
 internal class JsonSubtypesByPropertyPresenceConverter : JsonSubtypesConverter
 {

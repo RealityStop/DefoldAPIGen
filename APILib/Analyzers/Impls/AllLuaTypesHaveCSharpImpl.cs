@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel;
-using APILib.API;
-using APILib.Configuration;
+using APILib.Analyzers.Artifacts;
 using APILib.Helpers;
 
-namespace APILib.Analyzers;
+namespace APILib.Analyzers.Impls;
 
 public class AllLuaTypesHaveCSharpImpl : IAnalyzer, INotifyPropertyChangedExtended
 {

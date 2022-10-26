@@ -1,7 +1,6 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
-namespace TRAX.Extensions.JSON.Subtypes;
+namespace APILib.Helpers.Subtypes;
 //  MIT License
 //  
 //  Copyright (c) 2017 Emmanuel Counasse

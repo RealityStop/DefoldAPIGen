@@ -1,11 +1,11 @@
-﻿using APILib.Configuration;
+﻿using APILib.Configuration.CustomTypes;
 using APILib.Helpers;
 
-namespace APILib.Generators;
+namespace APILib.Analyzers.Generators;
 
 public static class CustomInterfaceRenderer
 {
-	public static string Render(CustomType customInterface)
+	public static string Render(CustomTypeDefinition customInterface)
 	{
 		if (!customInterface.Specification.Type.Equals("CustomInterface"))
 			throw new InvalidOperationException();
@@ -36,7 +36,7 @@ public static class CustomInterfaceRenderer
 	
 	
 
-	private static IDisposable WriteInterfaceSpecification(FormattedStringBuilder builder, CustomType customType)
+	private static IDisposable WriteInterfaceSpecification(FormattedStringBuilder builder, CustomTypeDefinition customType)
 	{
 		var customClass = customType.Specification as CustomInterface;
 		
@@ -47,12 +47,12 @@ public static class CustomInterfaceRenderer
 			builder.AppendLine($"/// {customClass.Comment}");
 			builder.AppendLine("/// ");
 		}
-		if (customType.Handling == null)
+		if (customType.LuaHandling == null)
 			builder.AppendLine("/// @CSharpLua.Ignore");
-		else if (customType.Handling.Handling == CustomLuaHandling.HandlingType.Ignore)
+		else if (customType.LuaHandling.Handling == CustomLuaHandling.HandlingType.Ignore)
 			builder.AppendLine("/// @CSharpLua.Ignore");
-		else if (customType.Handling?.Handling == CustomLuaHandling.HandlingType.Template)
-			builder.AppendLine($"/// @CSharpLua.Template = {customType.Handling.Template}");
+		else if (customType.LuaHandling?.Handling == CustomLuaHandling.HandlingType.Template)
+			builder.AppendLine($"/// @CSharpLua.Template = {customType.LuaHandling.Template}");
 		
 		builder.AppendLine("/// </summary>");
 		if (!string.IsNullOrWhiteSpace(customClass.Custom))
@@ -65,7 +65,7 @@ public static class CustomInterfaceRenderer
 	
 	
 
-	private static void WriteContent(FormattedStringBuilder builder, CustomType customType)
+	private static void WriteContent(FormattedStringBuilder builder, CustomTypeDefinition customType)
 	{
 		var customInterface = customType.Specification as CustomInterface;
 

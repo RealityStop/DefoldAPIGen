@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 #if NET
@@ -12,7 +9,7 @@ using TypeInfo = System.Type;
 using System.Reflection;
 #endif
 
-namespace TRAX.Extensions.JSON.Subtypes
+namespace APILib.Helpers.Subtypes
 {
 	//  MIT License
 	//

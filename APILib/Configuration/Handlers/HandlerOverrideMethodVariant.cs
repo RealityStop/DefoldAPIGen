@@ -1,9 +1,9 @@
-﻿using APILib.API;
+﻿using APILib.Configuration.API;
 using Newtonsoft.Json;
 
 namespace APILib.Configuration.Handlers;
 
-public class OverrideMethodVariant
+public class HandlerOverrideMethodVariant
 {
 	[JsonProperty("parameters")]
 	public List<DocParam> Parameters { get; set; }

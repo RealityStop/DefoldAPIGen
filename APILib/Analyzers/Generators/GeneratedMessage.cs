@@ -1,4 +1,4 @@
-﻿namespace APILib.Generators;
+﻿namespace APILib.Analyzers.Generators;
 
 public class GeneratedMessage
 {

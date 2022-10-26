@@ -1,7 +1,6 @@
-using System.Collections;
 using Newtonsoft.Json;
 
-namespace APILib.API;
+namespace APILib.Configuration.API;
 
 public class DocJson
 {

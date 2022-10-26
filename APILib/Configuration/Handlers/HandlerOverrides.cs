@@ -1,13 +1,13 @@
-﻿using APILib.API;
+﻿using APILib.Configuration.API;
 
 namespace APILib.Configuration.Handlers;
 
-public class Overrides
+public class HandlerOverrides
 {
-	public Dictionary<string, List<OverrideMethod>> Methods { get; set; }
+	public Dictionary<string, List<HandlerOverrideMethod>> Methods { get; set; }
 
 
-	public bool TryFetchOverrideForFunction(DocElement function, out OverrideMethod outValue)
+	public bool TryFetchOverrideForFunction(DocElement function, out HandlerOverrideMethod outValue)
 	{
 		if (Methods.TryGetValue(function.FunctionName(), out var overrideList))
 		{

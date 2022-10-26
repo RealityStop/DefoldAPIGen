@@ -1,14 +1,12 @@
-﻿using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml.Schema;
-using APILib.API;
-using APILib.Artifacts;
-using APILib.Configuration;
+﻿using System.Text.RegularExpressions;
+using APILib.Analyzers.Artifacts;
+using APILib.Analyzers.Generators;
+using APILib.Configuration.API;
+using APILib.Configuration.CustomTypes;
 using APILib.Configuration.Handlers;
-using APILib.Generators;
 using APILib.Helpers;
 
-namespace APILib.Analyzers;
+namespace APILib.Analyzers.Impls;
 
 public class GenerateClassesForAPIs : IAnalyzer
 {
@@ -52,8 +50,21 @@ public class GenerateClassesForAPIs : IAnalyzer
 				};
 
 				_ = _customHandlers.TryFetchHandling(nameSpace.Info.Namespace, out var handler);
-				
-				
+
+				if (handler != null)
+				{
+					if (!string.IsNullOrEmpty(handler.BaseClass))
+					{
+						generatedClass.IsStatic = false;
+						generatedClass.BaseClass = handler.BaseClass;
+					}
+
+					if (!string.IsNullOrEmpty(handler.CustomContent))
+					{
+						generatedClass.CustomContent = handler.CustomContent;
+					}
+				}
+
 				GenerateMethods(nameSpace, generatedClass, handler);
 				GenerateMessages(nameSpace, generatedClass, handler);
 				
@@ -68,19 +79,19 @@ public class GenerateClassesForAPIs : IAnalyzer
 
 
 
-	private void GenerateMethods(DocJson nameSpace, GeneratedClass generatedClass, CustomHandler customHandler)
+	private void GenerateMethods(DocJson nameSpace, GeneratedClass generatedClass, Handler handler)
 	{
 		foreach (var function in nameSpace.Functions())
 		{
-			if (ShouldIgnoreMethod(function, customHandler))
+			if (ShouldIgnoreMethod(function, handler))
 			{
 				function.Generated = true;
 				continue;
 			}
 
 			bool skip = false;
-			OverrideMethod overrideMethod = null;
-			if (customHandler?.Overrides?.TryFetchOverrideForFunction(function, out overrideMethod) ?? false)
+			HandlerOverrideMethod overrideMethod = null;
+			if (handler?.HandlerOverrides?.TryFetchOverrideForFunction(function, out overrideMethod) ?? false)
 			{
 				if (overrideMethod.Variants?.Any() ?? false)
 				{
@@ -102,7 +113,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 
 
 	private bool GenerateStandardMethods(GeneratedClass generatedClass, DocElement function,
-		OverrideMethod overrideMethod)
+		HandlerOverrideMethod overrideMethod)
 	{
 		List<MethodParam> parameterOptions = new List<MethodParam>();
 		List<MethodParam> returnValueOptions = new List<MethodParam>();
@@ -149,7 +160,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 
 
 	private bool GenerateVariantMethods(GeneratedClass generatedClass, DocElement function,
-		OverrideMethod overrideMethod)
+		HandlerOverrideMethod overrideMethod)
 	{
 		bool success = true;
 
@@ -274,9 +285,9 @@ public class GenerateClassesForAPIs : IAnalyzer
 	}
 
 	
-	private bool ShouldIgnoreMethod(DocElement function, CustomHandler customHandler)
+	private bool ShouldIgnoreMethod(DocElement function, Handler handler)
 	{
-		if (customHandler?.Overrides?.TryFetchOverrideForFunction(function, out var overrideMethod) ?? false)
+		if (handler?.HandlerOverrides?.TryFetchOverrideForFunction(function, out var overrideMethod) ?? false)
 		{
 			return overrideMethod.Ignore;
 		}
@@ -286,7 +297,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 	
 
 	
-	private void GenerateMessages(DocJson nameSpace, GeneratedClass generatedClass, CustomHandler outValue)
+	private void GenerateMessages(DocJson nameSpace, GeneratedClass generatedClass, Handler outValue)
 	{
 		foreach (var message in nameSpace.Messages())
 		{
@@ -329,10 +340,10 @@ public class GenerateClassesForAPIs : IAnalyzer
 	
 	
 
-	private IEnumerable<CustomType> CoveringTypes(string name)
+	private IEnumerable<CustomTypeDefinition> CoveringTypes(string name)
 	{
 		if (string.IsNullOrEmpty(name))
-			return Enumerable.Empty<CustomType>();
+			return Enumerable.Empty<CustomTypeDefinition>();
 
 		return _customTypes.CustomTypes.Where(x =>
 		{

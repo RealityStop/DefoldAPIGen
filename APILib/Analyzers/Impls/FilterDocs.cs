@@ -1,8 +1,7 @@
-﻿using APILib.API;
-using APILib.Artifacts;
+﻿using APILib.Analyzers.Artifacts;
 using APILib.Helpers;
 
-namespace APILib.Analyzers;
+namespace APILib.Analyzers.Impls;
 
 public class FilterDocs : IAnalyzer
 {

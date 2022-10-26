@@ -2,7 +2,7 @@
 using APILib.Helpers;
 using Newtonsoft.Json;
 
-namespace APILib.Configuration;
+namespace APILib.Configuration.CustomTypes;
 
 
 [JsonConverter(typeof(JsonInheritanceConverter), "Type")]

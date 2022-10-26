@@ -1,10 +1,8 @@
 ﻿using System.Diagnostics;
-using APILib.API;
-using APILib.Artifacts;
-using APILib.Configuration;
+using APILib.Analyzers.Artifacts;
 using APILib.Configuration.Handlers;
 
-namespace APILib.Analyzers;
+namespace APILib.Analyzers.Impls;
 
 public class CustomHandlersLoadAndParse :IAnalyzer
 {

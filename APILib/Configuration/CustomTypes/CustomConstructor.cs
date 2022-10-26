@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace APILib.Configuration;
+namespace APILib.Configuration.CustomTypes;
 
 public class CustomConstructor
 {

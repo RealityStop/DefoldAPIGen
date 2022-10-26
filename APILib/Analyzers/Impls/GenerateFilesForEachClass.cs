@@ -1,8 +1,7 @@
-﻿using System.Net;
-using APILib.Artifacts;
-using APILib.Generators;
+﻿using APILib.Analyzers.Artifacts;
+using APILib.Analyzers.Generators;
 
-namespace APILib.Analyzers;
+namespace APILib.Analyzers.Impls;
 
 public class GenerateFilesForEachClass : IAnalyzer
 {

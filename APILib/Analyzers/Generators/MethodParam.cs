@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
-using APILib.Configuration;
+using APILib.Configuration.CustomTypes;
 
-namespace APILib.Generators;
+namespace APILib.Analyzers.Generators;
 
 public class MethodParam
 {
@@ -64,13 +64,13 @@ public class CustomVoidParam : IMethodParamOption
 
 public class CustomTypeGeneratedParam : IMethodParamOption
 {
-	public CustomTypeGeneratedParam(CustomType customTypesForOption)
+	public CustomTypeGeneratedParam(CustomTypeDefinition customTypesForOption)
 	{
 		Types = customTypesForOption;
 	}
 
 
-	public CustomType Types { get; }
+	public CustomTypeDefinition Types { get; }
 }
 
 public class FunctionPointerGeneratedParam : IMethodParamOption

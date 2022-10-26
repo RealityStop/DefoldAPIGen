@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
-using APILib.API;
-using APILib.Configuration;
+using APILib.Analyzers.Artifacts;
+using APILib.Configuration.CustomTypes;
 
-namespace APILib.Analyzers;
+namespace APILib.Analyzers.Impls;
 
 public class CustomTypesLoadAndParse :IAnalyzer
 {

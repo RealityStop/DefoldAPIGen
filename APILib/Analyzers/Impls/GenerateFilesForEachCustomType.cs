@@ -1,7 +1,8 @@
-﻿using APILib.Configuration;
-using APILib.Generators;
+﻿using APILib.Analyzers.Artifacts;
+using APILib.Analyzers.Generators;
+using APILib.Configuration.CustomTypes;
 
-namespace APILib.Analyzers;
+namespace APILib.Analyzers.Impls;
 
 public class GenerateFilesForEachCustomType : IAnalyzer
 {
@@ -21,7 +22,7 @@ public class GenerateFilesForEachCustomType : IAnalyzer
 		{
 			foreach (var customType in typesArtifact.CustomTypes)
 			{
-				if (customType == CustomType.Void)
+				if (customType == CustomTypeDefinition.Void)
 					continue;
 				
 				string output = "";

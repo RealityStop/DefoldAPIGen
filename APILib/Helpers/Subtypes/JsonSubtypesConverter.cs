@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TRAX.Extensions.JSON.Subtypes;
+﻿namespace APILib.Helpers.Subtypes;
 
 //  MIT License
 //  

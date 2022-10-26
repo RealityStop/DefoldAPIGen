@@ -1,11 +1,11 @@
-﻿using APILib.Configuration;
+﻿using APILib.Configuration.CustomTypes;
 using APILib.Helpers;
 
-namespace APILib.Generators;
+namespace APILib.Analyzers.Generators;
 
 public static class CustomClassRenderer
 {
-	public static string Render(CustomType customClass)
+	public static string Render(CustomTypeDefinition customClass)
 	{
 		if (!customClass.Specification.Type.Equals("CustomClass"))
 			throw new InvalidOperationException();
@@ -35,7 +35,7 @@ public static class CustomClassRenderer
 	
 	
 
-	private static IDisposable WriteClassSpecification(FormattedStringBuilder builder, CustomType customType)
+	private static IDisposable WriteClassSpecification(FormattedStringBuilder builder, CustomTypeDefinition customType)
 	{
 		var customClass = customType.Specification as CustomClass;
 		
@@ -46,11 +46,15 @@ public static class CustomClassRenderer
 			builder.AppendLine($"/// {customClass.Comment}");
 			builder.AppendLine("/// ");
 		}
-		if (customType.Handling.Handling == CustomLuaHandling.HandlingType.Ignore)
-			builder.AppendLine("/// @CSharpLua.Ignore");
-		else if (customType.Handling.Handling == CustomLuaHandling.HandlingType.Template)
-			builder.AppendLine($"/// @CSharpLua.Template = {customType.Handling.Template}");
-		
+
+		if (customType.LuaHandling != null)
+		{
+			if (customType.LuaHandling.Handling == CustomLuaHandling.HandlingType.Ignore)
+				builder.AppendLine("/// @CSharpLua.Ignore");
+			else if (customType.LuaHandling.Handling == CustomLuaHandling.HandlingType.Template)
+				builder.AppendLine($"/// @CSharpLua.Template = {customType.LuaHandling.Template}");
+		}
+
 		builder.AppendLine("/// </summary>");
 		if (!string.IsNullOrWhiteSpace(customClass.Custom))
 			builder.AppendLine(customClass.Custom);
@@ -62,7 +66,7 @@ public static class CustomClassRenderer
 	
 	
 
-	private static void WriteContent(FormattedStringBuilder builder, CustomType customType)
+	private static void WriteContent(FormattedStringBuilder builder, CustomTypeDefinition customType)
 	{
 		var customClass = customType.Specification as CustomClass;
 

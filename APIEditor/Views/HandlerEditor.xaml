@@ -5,9 +5,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:APIEditor.Views"
         xmlns:configuration="clr-namespace:APILib.Configuration;assembly=APILib"
-        d:DataContext="{d:DesignInstance configuration:CustomClass}"
+        d:DataContext="{d:DesignInstance customTypes:CustomClass}"
         mc:Ignorable="d"
         xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:customTypes="clr-namespace:APILib.Configuration.CustomTypes;assembly=APILib"
         Title="HandlerEditor" Height="450" Width="800">
     <DockPanel>
         <GroupBox Header="Class Info">

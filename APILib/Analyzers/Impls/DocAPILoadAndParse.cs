@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
-using APILib.API;
+using APILib.Analyzers.Artifacts;
+using APILib.Configuration.API;
 using APILib.Helpers;
 
-namespace APILib.Analyzers;
+namespace APILib.Analyzers.Impls;
 
 /// <summary>
 /// Analyzer responsible for loading Doc API and registering it in the artifacts.

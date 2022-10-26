@@ -10,7 +10,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using APIEditor.Views;
 using APILib;
+using APILib.Analyzers.Artifacts;
 using APILib.Configuration;
+using APILib.Configuration.CustomTypes;
 using APILib.Helpers;
 using DynamicData;
 using DynamicData.Binding;
@@ -25,13 +27,13 @@ public class HandlerDisplayVM : INotifyPropertyChangedExtended
 	public Action<PropertyChangedEventArgs> InvokePropertyChanged => args => PropertyChanged?.Invoke(this, args);
 	public Action<string> RaisePropertyChanged => arg => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(arg));
 
-	private CustomType? _selectedItem = default;
-	public CustomType? SelectedItem { get =>  _selectedItem; set => this.MutateVerbose(ref _selectedItem, value, RaisePropertyChanged); }
+	private CustomTypeDefinition? _selectedItem = default;
+	public CustomTypeDefinition? SelectedItem { get =>  _selectedItem; set => this.MutateVerbose(ref _selectedItem, value, RaisePropertyChanged); }
 	
 	
 	public GenerationState State { get; }
 
-	public ObservableCollectionExtended<CustomType> CustomHandlers { get; } = new ObservableCollectionExtended<CustomType>();
+	public ObservableCollectionExtended<CustomTypeDefinition> CustomHandlers { get; } = new ObservableCollectionExtended<CustomTypeDefinition>();
 	
 	public ReactiveCommand<Unit, Unit> CreateNewCMD { get; }
 	public ReactiveCommand<Unit, Task> DataGridDoubleClick { get; }
@@ -68,7 +70,7 @@ public class HandlerDisplayVM : INotifyPropertyChangedExtended
 					    "Create directory?", MessageBoxButton.YesNo))
 					Directory.CreateDirectory(State.Settings.HandlersLocation);
 
-			var newHandler = new CustomType() { Name = "New_Class" };
+			var newHandler = new CustomTypeDefinition() { Name = "New_Class" };
 			var editor = new HandlerEditor(newHandler);
 			editor.ShowDialog();
 

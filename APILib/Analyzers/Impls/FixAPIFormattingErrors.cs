@@ -1,8 +1,8 @@
 ﻿using System.Text.RegularExpressions;
-using APILib.API;
-using APILib.Artifacts;
+using APILib.Analyzers.Artifacts;
+using APILib.Configuration.API;
 
-namespace APILib.Analyzers;
+namespace APILib.Analyzers.Impls;
 
 public class FixAPIFormattingErrors : IAnalyzer
 {

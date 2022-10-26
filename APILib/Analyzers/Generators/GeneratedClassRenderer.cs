@@ -1,11 +1,9 @@
-﻿using System.Collections.Immutable;
-using System.Reactive.Disposables;
+﻿using System.Reactive.Disposables;
 using System.Text;
-using APILib.Artifacts;
-using APILib.Configuration;
+using APILib.Analyzers.Artifacts;
 using APILib.Helpers;
 
-namespace APILib.Generators;
+namespace APILib.Analyzers.Generators;
 
 public static  class GeneratedClassRenderer
 {
@@ -17,8 +15,15 @@ public static  class GeneratedClassRenderer
 		{
 			using (WriteClassSpecification(builder, targetClass))
 			{
+				builder.AppendLine("#region Defold API");
+				
 				WriteMessages(builder, targetClass);
 				WriteMethods(builder, targetClass);
+				
+				builder.AppendLine("#endregion Defold API");
+
+				WriteCustomContent(builder, targetClass);
+
 			}
 		}
 
@@ -26,9 +31,11 @@ public static  class GeneratedClassRenderer
 	}
 
 
+
 	private static IDisposable WriteInitialPreamble(FormattedStringBuilder builder)
 	{
 		builder.AppendLine("using System;");
+		builder.AppendLine("using support;");
 		builder.AppendLine("using types;");
 		builder.AppendLine("");
 		
@@ -44,7 +51,7 @@ public static  class GeneratedClassRenderer
 			builder.AppendLine("/// ");
 		}
 		builder.AppendLine("/// </summary>");
-		builder.AppendLine($"public {(generatedClass.IsStatic? "static " : "")}class {generatedClass.ClassName.First().ToString().ToUpper() + generatedClass.ClassName.Substring(1)}");
+		builder.AppendLine($"public {(generatedClass.IsStatic? "static " : "")}class {generatedClass.ClassName.First().ToString().ToUpper() + generatedClass.ClassName.Substring(1)}{(string.IsNullOrWhiteSpace(generatedClass.BaseClass)?"":" : " + generatedClass.BaseClass)}");
 		
 		return builder.Scope();
 	}
@@ -96,6 +103,23 @@ public static  class GeneratedClassRenderer
 			}
 		}
 	}
+	
+	
+	
+	private static void WriteCustomContent(FormattedStringBuilder builder, GeneratedClass targetClass)
+	{
+		if (string.IsNullOrEmpty(targetClass.CustomContent))
+			return;
+
+		var lines = targetClass.CustomContent.Split(new char[] { '\n' });
+			//.Select(x => x.Trim(new char[]{' '}));
+
+		foreach (var line in lines)
+		{
+			builder.AppendLine(line);
+		}
+	}
+
 
 
 	private static void RenderPermutations(

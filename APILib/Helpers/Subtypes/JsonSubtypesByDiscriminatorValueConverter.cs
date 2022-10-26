@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace TRAX.Extensions.JSON.Subtypes;
+namespace APILib.Helpers.Subtypes;
 //  MIT License
 //  
 //  Copyright (c) 2017 Emmanuel Counasse

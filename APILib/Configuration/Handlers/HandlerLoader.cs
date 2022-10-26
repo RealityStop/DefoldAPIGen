@@ -2,7 +2,7 @@
 
 namespace APILib.Configuration.Handlers;
 
-public class HandlerLoader: IFileLoader<CustomHandler>
+public class HandlerLoader: IFileLoader<Handler>
 {
 	public bool FilterFilename(string file)
 	{
@@ -10,11 +10,11 @@ public class HandlerLoader: IFileLoader<CustomHandler>
 	}
 
 
-	public CustomHandler Parse(string file)
+	public Handler Parse(string file)
 	{
 		string input = File.ReadAllText(file);
 		
-		return JsonConvert.DeserializeObject<CustomHandler>(input) ?? throw new InvalidOperationException();
+		return JsonConvert.DeserializeObject<Handler>(input) ?? throw new InvalidOperationException();
 	}
 
 

@@ -1,6 +1,6 @@
-﻿using APILib.Configuration;
+﻿using APILib.Configuration.CustomTypes;
 
-namespace APILib.Generators;
+namespace APILib.Analyzers.Generators;
 
 public class GeneratedMethod
 {

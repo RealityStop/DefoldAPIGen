@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
-namespace TRAX.Extensions.JSON.Subtypes;
+namespace APILib.Helpers.Subtypes;
 
 public class JsonSubtypesWithPropertyConverterBuilder
 {

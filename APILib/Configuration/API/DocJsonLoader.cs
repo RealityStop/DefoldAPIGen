@@ -1,4 +1,4 @@
-﻿namespace APILib.API;
+﻿namespace APILib.Configuration.API;
 
 public class DocJsonLoader : IFileLoader<DocJson>
 {

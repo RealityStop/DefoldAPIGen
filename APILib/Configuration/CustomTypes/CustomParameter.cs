@@ -1,4 +1,4 @@
-﻿namespace APILib.Configuration;
+﻿namespace APILib.Configuration.CustomTypes;
 
 public class CustomParameter
 {
