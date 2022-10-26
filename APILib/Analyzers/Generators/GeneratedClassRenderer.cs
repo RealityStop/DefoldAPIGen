@@ -186,8 +186,7 @@ public static  class GeneratedClassRenderer
 		//build the specification
 		StringBuilder specificationBuilder = new StringBuilder();
 		specificationBuilder.Append("public ");
-		if (generatedClass.IsStatic)
-			specificationBuilder.Append("static ");
+		specificationBuilder.Append("static ");
 		specificationBuilder.Append("extern ");
 			specificationBuilder.Append(RenderParamOptionType(returnValue));
 
