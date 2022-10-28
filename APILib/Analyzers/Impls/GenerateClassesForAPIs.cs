@@ -53,6 +53,11 @@ public class GenerateClassesForAPIs : IAnalyzer
 
 				if (handler != null)
 				{
+					if (!string.IsNullOrEmpty(handler.ClassName))
+					{
+						generatedClass.ClassName = handler.ClassName;
+					}
+					
 					if (!string.IsNullOrEmpty(handler.BaseClass))
 					{
 						generatedClass.IsStatic = false;

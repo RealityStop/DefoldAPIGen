@@ -7,6 +7,9 @@ public class Handler
 	[JsonProperty("namespace")] public string Namespace { get; set; }
 	[JsonProperty("ignore")] public bool Ignore { get; set; }
 
+	[JsonProperty] public string ClassName { get; set; }
+
+
 	[JsonProperty] public string BaseClass { get; set; }
 
 
