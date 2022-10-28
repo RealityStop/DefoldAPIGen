@@ -60,6 +60,11 @@ public static  class GeneratedClassRenderer
 
 	private static void WriteMessages(FormattedStringBuilder builder, GeneratedClass generatedClass)
 	{
+		if (!generatedClass.Messages.Any())
+			return;
+		
+		builder.AppendLine("#region Messages");
+		
 		foreach (var generatedMessage in generatedClass.Messages)
 		{
 			builder.AppendLine("/// <summary>");
@@ -87,6 +92,8 @@ public static  class GeneratedClassRenderer
 			builder.AppendLine("");
 			builder.AppendLine("");
 		}
+		
+		builder.AppendLine("#endregion Messages");
 	}
 
 	
