@@ -68,12 +68,16 @@ public static class CustomClassRenderer
 
 	private static void WriteContent(FormattedStringBuilder builder, CustomTypeDefinition customType)
 	{
+		
 		var customClass = customType.Specification as CustomClass;
-
-		if (!string.IsNullOrWhiteSpace(customClass.Contents))
-		{
-			WriteUserSpecifiedContent(builder, customClass);
+		if (string.IsNullOrEmpty(customClass.Contents))
 			return;
+
+		var lines = customClass.Contents.Split(new char[] { '\n' });
+
+		foreach (var line in lines)
+		{
+			builder.AppendLine(line);
 		}
 	}
 
