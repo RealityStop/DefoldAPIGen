@@ -1,4 +1,4 @@
-﻿using APILib.Analyzers.Artifacts;
+using APILib.Analyzers.Artifacts;
 using APILib.Analyzers.Generators;
 
 namespace APILib.Analyzers.Impls;
@@ -31,11 +31,6 @@ public class GenerateFilesForEachClass : IAnalyzer
 
 	public void Reset(GenerationState genState)
 	{
-		_outputFolder = Path.Combine(genState.Settings.HandlersLocation, "out");
-		if (Directory.Exists(_outputFolder))
-			Directory.Delete(_outputFolder, true);
-
-		
-		Directory.CreateDirectory(_outputFolder);
+		_outputFolder = genState.Settings.OutputLocation;
 	}
 }

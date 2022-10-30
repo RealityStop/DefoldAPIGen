@@ -22,6 +22,9 @@ public class GenerationSettings : INotifyPropertyChangedExtended
 	[JsonProperty]
 	public string? HandlersLocation { get =>  _handlersLocation; set => this.MutateVerbose(ref _handlersLocation, value, RaisePropertyChanged); }
 
+	private string? _outputLocation = ".";
+	[JsonProperty]
+	public string? OutputLocation { get =>  _outputLocation; set => this.MutateVerbose(ref _outputLocation, value, RaisePropertyChanged); }
 	
 	
 	private bool _isValid;

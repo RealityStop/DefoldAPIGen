@@ -94,6 +94,8 @@ public static  class GeneratedClassRenderer
 		}
 		
 		builder.AppendLine("#endregion Messages");
+		builder.AppendLine("");
+		builder.AppendLine("");
 	}
 
 	
@@ -285,7 +287,7 @@ public static  class GeneratedClassRenderer
 
 		var templateParameters = string.Join(", ", parametersSoFar.Select(x =>"{" +  $"{count++}" + "}"));
 		
-		return $"{generatedClass.ClassName}.{generatedMethod.MethodName}({templateParameters})";
+		return $"{generatedClass.LuaAPIName}.{generatedMethod.MethodName}({templateParameters})";
 	}
 
 

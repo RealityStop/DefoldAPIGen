@@ -59,12 +59,6 @@ public class GenerateFilesForEachCustomType : IAnalyzer
 
 	public void Reset(GenerationState genState)
 	{
-		_outputFolder = Path.Combine(genState.Settings.HandlersLocation, "out\\types");
-		if (Directory.Exists(_outputFolder))
-			Directory.Delete(_outputFolder, true);
-
-		Thread.Sleep(250);
-		
-		Directory.CreateDirectory(_outputFolder);
+		_outputFolder = Path.Combine(genState.Settings.OutputLocation, "types");
 	}
 }
