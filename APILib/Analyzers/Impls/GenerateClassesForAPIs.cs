@@ -141,7 +141,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 			{
 				_output
 					.WriteLine(
-						$"Unable to convert {generatedClass.ClassName}.{function.Name} because of unhandled parameter type '{string.Join(",", parameter.AllTypes())}'");
+						$"Unable to convert {generatedClass.LuaAPIName}.{function.Name} because of unhandled parameter type '{string.Join(",", parameter.AllTypes())}'");
 				success = false;
 			}
 		}
@@ -154,7 +154,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 			{
 				_output
 					.WriteLine(
-						$"Unable to convert {generatedClass.ClassName}.{function.Name} because of unhandled return type '{string.Join(",", returnValue.AllTypes())}'");
+						$"Unable to convert {generatedClass.LuaAPIName}.{function.Name} because of unhandled return type '{string.Join(",", returnValue.AllTypes())}'");
 				success = false;
 			}
 		}
@@ -185,7 +185,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 				{
 					_output
 						.WriteLine(
-							$"Unable to convert {generatedClass.ClassName}.{function.Name} because of unhandled parameter type '{string.Join(",", parameter.AllTypes())}'");
+							$"Unable to convert {generatedClass.LuaAPIName}.{function.Name} because of unhandled parameter type '{string.Join(",", parameter.AllTypes())}'");
 					skip = true;
 				}
 			}
@@ -198,7 +198,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 				{
 					_output
 						.WriteLine(
-							$"Unable to convert {generatedClass.ClassName}.{function.Name} because of unhandled return type '{string.Join(",", returnValue.AllTypes())}'");
+							$"Unable to convert {generatedClass.LuaAPIName}.{function.Name} because of unhandled return type '{string.Join(",", returnValue.AllTypes())}'");
 					skip = true;
 				}
 			}

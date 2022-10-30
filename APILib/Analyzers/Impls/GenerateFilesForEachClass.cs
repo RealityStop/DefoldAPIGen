@@ -1,4 +1,4 @@
-using APILib.Analyzers.Artifacts;
+﻿using APILib.Analyzers.Artifacts;
 using APILib.Analyzers.Generators;
 
 namespace APILib.Analyzers.Impls;
@@ -21,7 +21,7 @@ public class GenerateFilesForEachClass : IAnalyzer
 		foreach (var generatedClass in generatedClasses)
 		{
 			string output = GeneratedClassRenderer.Render(generatedClass);
-			var outputFile = Path.Combine(_outputFolder, $"{generatedClass.ClassName}.cs");
+			var outputFile = Path.Combine(_outputFolder, $"{generatedClass.LuaAPIName}.cs");
 			File.WriteAllText(outputFile, output);
 		}
 
