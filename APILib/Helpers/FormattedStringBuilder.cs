@@ -32,6 +32,9 @@ public class FormattedStringBuilder
 
 	private string OffsetByTabs(string message)
 	{
+		if (string.IsNullOrEmpty(message))
+			return message;
+		
 		return $"{_tabPrefix}{message}";
 	}
 	
