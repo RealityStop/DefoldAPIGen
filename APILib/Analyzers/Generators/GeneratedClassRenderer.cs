@@ -112,16 +112,19 @@ public static  class GeneratedClassRenderer
 			}
 		}
 	}
-	
-	
-	
+
+
+
 	private static void WriteCustomContent(FormattedStringBuilder builder, GeneratedClass targetClass)
 	{
 		if (string.IsNullOrEmpty(targetClass.CustomContent))
 			return;
 
 		var lines = targetClass.CustomContent.Split(new char[] { '\n' });
-			//.Select(x => x.Trim(new char[]{' '}));
+		//.Select(x => x.Trim(new char[]{' '}));
+
+		builder.AppendLine("");
+		builder.AppendLine("");
 
 		foreach (var line in lines)
 		{
