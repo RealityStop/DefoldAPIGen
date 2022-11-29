@@ -8,6 +8,13 @@ using APILib.Helpers;
 
 namespace APILib.Analyzers.Impls;
 
+public enum Direction
+{
+	Parameter,
+	Return
+}
+
+
 public class GenerateClassesForAPIs : IAnalyzer
 {
 	public AnalyzerResult Result { get; set; }
@@ -135,7 +142,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 		bool success = true;
 		foreach (var parameter in sourceParameterList)
 		{
-			if (GenerateMethodParameter(parameter, out var methodParam))
+			if (GenerateMethodParameter(parameter, out var methodParam, Direction.Parameter))
 				parameterOptions.Add(methodParam);
 			else
 			{
@@ -148,7 +155,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 			
 		foreach (var returnValue in sourceReturnList)
 		{
-			if (GenerateMethodParameter(returnValue, out var methodParam))
+			if (GenerateMethodParameter(returnValue, out var methodParam, Direction.Return))
 				returnValueOptions.Add(methodParam);
 			else
 			{
@@ -179,7 +186,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 			bool skip = false;
 			foreach (var parameter in overrideMethodVariant.Parameters)
 			{
-				if (GenerateMethodParameter(parameter, out var methodParam))
+				if (GenerateMethodParameter(parameter, out var methodParam, Direction.Parameter))
 					parameterOptions.Add(methodParam);
 				else
 				{
@@ -192,7 +199,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 			
 			foreach (var returnValue in overrideMethodVariant.ReturnValues)
 			{
-				if (GenerateMethodParameter(returnValue, out var methodParam))
+				if (GenerateMethodParameter(returnValue, out var methodParam, Direction.Return))
 					returnValueOptions.Add(methodParam);
 				else
 				{
@@ -218,13 +225,18 @@ public class GenerateClassesForAPIs : IAnalyzer
 	
 
 
-	private bool GenerateMethodParameter(DocParam parmDocumentation, out MethodParam methodParam)
+	private bool GenerateMethodParameter(DocParam parmDocumentation, out MethodParam methodParam, Direction direction)
 	{
 		methodParam = new MethodParam(parmDocumentation.name, parmDocumentation.doc);
 		
 		foreach (var type in parmDocumentation.AllTypes())
 		{
-			if (type.StartsWith("function", StringComparison.OrdinalIgnoreCase))
+			if (type.StartsWith("literal:", StringComparison.OrdinalIgnoreCase))
+			{
+				var literalType = type.Substring("literal:".Length);
+				methodParam.AddOption(new LiteralGeneratedParam(literalType));
+			}
+			else if (type.StartsWith("function", StringComparison.OrdinalIgnoreCase))
 			{
 				if (!GenerateFunctionParameter(type, out var functionParam))
 					return false;
@@ -233,9 +245,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 			}
 			else
 			{
-				
-				
-				var parmOptions = CoveringTypes(type).ToArray();
+				var parmOptions = CoveringTypes(type, direction).ToArray();
 				foreach (var customType in parmOptions)
 				{
 					methodParam.AddOption(new CustomTypeGeneratedParam(customType));
@@ -264,7 +274,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 			foreach (var parameterMatch in parameterMatches)
 			{
 				
-				var parameterTypes = CoveringTypes(parameterMatch.Item1).ToArray();
+				var parameterTypes = CoveringTypes(parameterMatch.Item1, Direction.Return).ToArray();
 				if (parameterTypes.Count() != 1)
 					throw new InvalidOperationException();
 
@@ -310,7 +320,7 @@ public class GenerateClassesForAPIs : IAnalyzer
 
 			var paramList = message.Parameters.Select(x =>
 			{
-				var coveringTypes = x.AllTypes().SelectMany(y => CoveringTypes(y));
+				var coveringTypes = x.AllTypes().SelectMany(y => CoveringTypes(y, Direction.Parameter));
 				if (coveringTypes.Count() != 1)
 				{
 					_output.WriteLine(
@@ -345,15 +355,29 @@ public class GenerateClassesForAPIs : IAnalyzer
 	
 	
 
-	private IEnumerable<CustomTypeDefinition> CoveringTypes(string name)
+	private IEnumerable<CustomTypeDefinition> CoveringTypes(string name, Direction direction)
 	{
 		if (string.IsNullOrEmpty(name))
 			return Enumerable.Empty<CustomTypeDefinition>();
 
 		return _customTypes.CustomTypes.Where(x =>
 		{
-			return x.Name.Equals(name, StringComparison.OrdinalIgnoreCase) ||
-			       x.Implements.Any(x => x.Equals(name, StringComparison.OrdinalIgnoreCase));
+			if (!(x.Name.Equals(name, StringComparison.OrdinalIgnoreCase) ||
+			    x.Implements.Any(x => x.Equals(name, StringComparison.OrdinalIgnoreCase))))
+				return false;
+			
+			if (x.DirectionRestriction != CustomTypeDirectionRestriction.All)
+			{
+				if (x.DirectionRestriction == CustomTypeDirectionRestriction.ParameterOnly &&
+				    direction != Direction.Parameter)
+					return false;
+
+				if (x.DirectionRestriction == CustomTypeDirectionRestriction.ReturnOnly &&
+				    direction != Direction.Return)
+					return false;
+			}
+
+			return true;
 		});
 	}
 

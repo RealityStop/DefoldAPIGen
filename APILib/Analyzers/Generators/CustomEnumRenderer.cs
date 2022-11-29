@@ -27,6 +27,7 @@ public static class CustomEnumRenderer
 	private static IDisposable WriteInitialPreamble(FormattedStringBuilder builder)
 	{
 		builder.AppendLine("using System;");
+		builder.AppendLine("using lua;");
 		builder.AppendLine("");
 		builder.AppendLine("namespace types");
 

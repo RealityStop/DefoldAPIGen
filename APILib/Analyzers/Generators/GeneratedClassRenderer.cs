@@ -36,6 +36,7 @@ public static  class GeneratedClassRenderer
 	{
 		builder.AppendLine("using System;");
 		builder.AppendLine("using support;");
+		builder.AppendLine("using lua;");
 		builder.AppendLine("using types;");
 		builder.AppendLine("");
 		
@@ -267,6 +268,10 @@ public static  class GeneratedClassRenderer
 		if (returnvaluesOption is CustomTypeGeneratedParam customParam)
 		{
 			return customParam.Types.Name;
+		}
+		else if (returnvaluesOption is LiteralGeneratedParam literalParam)
+		{
+			return literalParam.Literal;
 		}
 		else if (returnvaluesOption is FunctionPointerGeneratedParam functionParam)
 		{

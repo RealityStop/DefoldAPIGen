@@ -24,6 +24,9 @@ public class GenerateFilesForEachCustomType : IAnalyzer
 			{
 				if (customType == CustomTypeDefinition.Void)
 					continue;
+
+				if (!customType.Generate)
+					continue;
 				
 				string output = "";
 				if (customType.Specification is CustomClass customClass)
@@ -48,6 +51,7 @@ public class GenerateFilesForEachCustomType : IAnalyzer
 						outputFilename = customType.Filename;
 					
 					var outputFile = Path.Combine(_outputFolder, $"{outputFilename}.cs");
+					Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
 					File.WriteAllText(outputFile, output);
 				}
 			}

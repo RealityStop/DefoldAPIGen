@@ -83,3 +83,15 @@ public class FunctionPointerGeneratedParam : IMethodParamOption
 
 	public MethodParam[] Params { get; }
 }
+
+
+public class LiteralGeneratedParam : IMethodParamOption
+{
+	public LiteralGeneratedParam(string literal)
+	{
+		Literal = literal;
+	}
+
+
+	public string Literal { get; }
+}
